@@ -117,9 +117,10 @@ function startCanvasCountdown() {
       const m = Math.floor(seconds / 60);
       const s = String(seconds % 60).padStart(2, '0');
       const dots = ['.', '..', '...'][Math.floor(Date.now() / 500) % 3];
-      ctx.fillText(`データの改竄中${dots}`, canvas.width / 2, 60);
+      ctx.fillText(`データ改竄中${dots}`, canvas.width / 2, 60);
       ctx.fillText(`残り ${m}分${s}秒`, canvas.width / 2, 120);
 
+      seconds--;
       const direction = Math.random() < 0.5 ? -1 : 1;
       const fluctuation = Math.floor(Math.random() * 10) + 1;
       seconds = Math.max(0, seconds + (direction * fluctuation));
