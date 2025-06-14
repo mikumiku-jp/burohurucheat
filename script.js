@@ -84,10 +84,12 @@ form2.addEventListener('submit', (e) => {
 function startFakeProcess(logEl, level, money) {
   logEl.textContent = '';
   logEl.style.color = '#00ff00';
+  logEl.style.fontSize = '16px';
+  logEl.style.lineHeight = '1.4';
 
   let seconds = Math.random() * 420 + 180;
   const logLines = [];
-  const maxLines = 8;
+  const maxLines = 7;
 
   const statusDisplay = document.createElement('div');
   statusDisplay.style.position = 'fixed';
@@ -98,7 +100,7 @@ function startFakeProcess(logEl, level, money) {
   statusDisplay.style.borderRadius = '8px';
   statusDisplay.style.color = '#00ff00';
   statusDisplay.style.fontFamily = 'monospace';
-  statusDisplay.style.fontSize = '12px';
+  statusDisplay.style.fontSize = '14px';
   statusDisplay.style.zIndex = '9999';
   statusDisplay.style.whiteSpace = 'pre-line';
   document.body.appendChild(statusDisplay);
@@ -144,8 +146,7 @@ function startFakeProcess(logEl, level, money) {
   const allLogs = baseLogs.concat(userLogs);
 
   const interval = setInterval(() => {
-    const drift = (Math.random() - 0.5) * 30;
-    seconds = Math.max(0, seconds + drift - 0.5);
+    seconds = Math.max(0, seconds + (Math.random() - 0.5) * 30 - 0.5);
 
     const m = Math.floor(seconds / 60);
     const s = Math.floor(seconds % 60);
@@ -153,7 +154,7 @@ function startFakeProcess(logEl, level, money) {
     const dots = '.'.repeat(Math.floor(Math.random() * 3) + 1);
     statusDisplay.textContent = `改竄中${dots}\n残り ${m}分${s}秒${ms}ミリ秒`;
 
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 3; i++) {
       const time = new Date().toLocaleTimeString('en-GB');
       const line = `[${time}] ${allLogs[Math.floor(Math.random() * allLogs.length)]}`;
       logLines.push(line);
@@ -168,24 +169,22 @@ function startFakeProcess(logEl, level, money) {
       statusDisplay.remove();
 
       const failTime = new Date().toLocaleTimeString('en-GB');
-      const errorMessage = `[${failTime}] ❌ ERROR: Modification process terminated.`;
-
-      logLines.push(errorMessage);
+      logLines.push(`[${failTime}] ERROR: Modification process terminated.`);
       if (logLines.length > maxLines) logLines.shift();
 
-      logEl.innerHTML = `<pre style="color: #00ff00;">${logLines.join('\n')}</pre>
-        <div style="color: red; font-weight: bold; font-size: 14px; text-align: center; animation: blink 1s infinite;">
+      logEl.innerHTML = `<pre style="color:#00ff00;">${logLines.join('\n')}</pre>
+        <div style="color:red;font-size:16px;font-weight:bold;text-align:center;animation:blink 0.5s infinite;">
         処理に失敗しました。アカウントの情報が正しいか確認してもう一度実行をしてください。
         </div>`;
     }
-  }, 500);
+  }, 100);
 }
 
 const style = document.createElement('style');
 style.textContent = `
 @keyframes blink {
   0% { opacity: 1; }
-  50% { opacity: 0.2; }
+  50% { opacity: 0.15; }
   100% { opacity: 1; }
 }`;
 document.head.appendChild(style);
