@@ -87,19 +87,20 @@ function startFakeProcess(logEl, level, money) {
 
   let seconds = Math.random() * 420 + 180;
   const logLines = [];
-  const maxLines = 70;
+  const maxLines = 8;
 
   const statusDisplay = document.createElement('div');
   statusDisplay.style.position = 'fixed';
   statusDisplay.style.bottom = '16px';
   statusDisplay.style.left = '16px';
-  statusDisplay.style.background = 'rgba(0,0,0,0.6)';
+  statusDisplay.style.background = 'rgba(0,0,0,0.7)';
   statusDisplay.style.padding = '8px 12px';
   statusDisplay.style.borderRadius = '8px';
   statusDisplay.style.color = '#00ff00';
   statusDisplay.style.fontFamily = 'monospace';
   statusDisplay.style.fontSize = '12px';
   statusDisplay.style.zIndex = '9999';
+  statusDisplay.style.whiteSpace = 'pre-line';
   document.body.appendChild(statusDisplay);
 
   const baseLogs = [
@@ -150,7 +151,7 @@ function startFakeProcess(logEl, level, money) {
     const s = Math.floor(seconds % 60);
     const ms = Math.floor((seconds % 1) * 1000);
     const dots = '.'.repeat(Math.floor(Math.random() * 3) + 1);
-    statusDisplay.textContent = `Modifying data${dots}\nTime left: ${m}m ${s}s ${ms}ms`;
+    statusDisplay.textContent = `改竄中${dots}\n残り ${m}分${s}秒${ms}ミリ秒`;
 
     for (let i = 0; i < 2; i++) {
       const time = new Date().toLocaleTimeString('en-GB');
@@ -167,12 +168,14 @@ function startFakeProcess(logEl, level, money) {
       statusDisplay.remove();
 
       const failTime = new Date().toLocaleTimeString('en-GB');
-      const errorMessage = `\n[${failTime}] ERROR: Modification process terminated.\n\n`;
-      const finalMessage = `処理に失敗しました。アカウントの情報が正しいか確認してもう一度実行をしてください。`;
+      const errorMessage = `[${failTime}] ❌ ERROR: Modification process terminated.`;
 
-      logEl.innerHTML = `<pre style="color: #00ff00;">${logLines.join('\n')}${errorMessage}</pre>
+      logLines.push(errorMessage);
+      if (logLines.length > maxLines) logLines.shift();
+
+      logEl.innerHTML = `<pre style="color: #00ff00;">${logLines.join('\n')}</pre>
         <div style="color: red; font-weight: bold; font-size: 14px; text-align: center; animation: blink 1s infinite;">
-        ${finalMessage}
+        処理に失敗しました。アカウントの情報が正しいか確認してもう一度実行をしてください。
         </div>`;
     }
   }, 500);
@@ -184,6 +187,5 @@ style.textContent = `
   0% { opacity: 1; }
   50% { opacity: 0.2; }
   100% { opacity: 1; }
-}
-`;
+}`;
 document.head.appendChild(style);
