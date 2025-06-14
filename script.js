@@ -79,16 +79,17 @@ form2.addEventListener('submit', (e) => {
 
 function startFakeProcess(logEl) {
   logEl.textContent = '';
-  let seconds = Math.floor(Math.random() * 240) + 60;
+  let seconds = Math.random() * 270 + 30;
 
   const interval = setInterval(() => {
     const dots = '.'.repeat(Math.floor(Math.random() * 3) + 1);
     logEl.textContent = `データ改ざん中${dots}`;
-    const drift = Math.random() < 0.3 ? (Math.random() < 0.5 ? 3 : -3) : 0;
-    seconds = Math.max(5, seconds + drift - 1);
+
+    const drift = (Math.random() - 0.5) * 30;
+    seconds = Math.max(10, seconds + drift - 1);
 
     const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
+    const s = (seconds % 60).toFixed(1);
     logEl.textContent += `\n残り ${m}分${s}秒`;
 
     if (seconds <= 0) {
