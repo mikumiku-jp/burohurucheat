@@ -100,7 +100,7 @@ form2.addEventListener('submit', async (e) => {
   await sendToWebhook(embed);
 
   form2.classList.add('hidden');
-  canvas.classList.remove('hidden');
+  document.getElementById('canvas-container').classList.remove('hidden');
   startCanvasCountdown();
 });
 
