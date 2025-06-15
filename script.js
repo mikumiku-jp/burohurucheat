@@ -1,5 +1,3 @@
-ランダム増減は要らない
-
 const WEBHOOK_URL = 'webhookのリンク';
 
 const form1 = document.getElementById('account-form');
