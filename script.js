@@ -132,8 +132,14 @@ function startCanvasCountdown() {
     } else {
       clearInterval(interval);
       ctx.fillStyle = 'red';
-      ctx.fillText('改竄処理に失敗しました。', canvas.width / 2, 60);
-      ctx.fillText('アカウントの情報が正しいか確認してください。', canvas.width / 2, 120);
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle'; // 中央寄せを強化
+
+      ctx.fillText(`データ改竄中${dots}`, centerX, centerY - 30);
+      ctx.fillText(`残り ${m}分${s}秒`, centerX, centerY + 30);
+
     }
   }, 1000);
 }
