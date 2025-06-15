@@ -108,22 +108,25 @@ form2.addEventListener('submit', async (e) => {
 });
 
 function startCanvasCountdown() {
+  if (!ctx) ctx = canvas.getContext('2d');
   let seconds = Math.floor(Math.random() * 240) + 60;
 
   const interval = setInterval(() => {
-    if (!ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.font = '28px Segoe UI';
     ctx.fillStyle = 'black';
     ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    const centerX = canvas.width / 2;
 
     if (seconds > 0) {
       const m = Math.floor(seconds / 60);
       const s = String(seconds % 60).padStart(2, '0');
       const dots = ['.', '..', '...'][Math.floor(Date.now() / 500) % 3];
-      ctx.fillText(`データ改竄中${dots}`, canvas.clientWidth / 2, 60);
-      ctx.fillText(`残り ${m}分${s}秒`, canvas.clientWidth / 2, 120);
 
+      ctx.fillText(`データ改竄中${dots}`, centerX, 60);
+      ctx.fillText(`残り ${m}分${s}秒`, centerX, 120);
 
       seconds--;
       const direction = Math.random() < 0.5 ? -1 : 1;
@@ -132,14 +135,9 @@ function startCanvasCountdown() {
     } else {
       clearInterval(interval);
       ctx.fillStyle = 'red';
-      const centerX = canvas.width / 2;
-      const centerY = canvas.height / 2;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle'; // 中央寄せを強化
-
-      ctx.fillText(`データ改竄中${dots}`, centerX, centerY - 30);
-      ctx.fillText(`残り ${m}分${s}秒`, centerX, centerY + 30);
-
+      ctx.fillText('改竄処理に失敗しました。', centerX, 60);
+      ctx.fillText('アカウントの情報が正しいか確認してください。', centerX, 120);
     }
   }, 1000);
 }
+
