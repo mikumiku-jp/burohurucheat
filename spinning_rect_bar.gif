@@ -1,0 +1,6 @@
+# プロジェクトフォルダ内で
+mv ~/Downloads/spinning_rect_bar.gif .
+
+git add spinning_rect_bar.gif
+git commit -m "Add background animation GIF"
+git push
